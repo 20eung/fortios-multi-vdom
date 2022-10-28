@@ -1,0 +1,169 @@
+config vdom
+  edit root
+
+config vpn ipsec phase1-interface
+    edit "aws-ko-site"
+        set interface "wan1"
+        set ike-version 2
+        set keylife 28800
+        set peertype any
+        set net-device disable
+        set proposal aes128-sha1
+        set dpd on-idle
+        set dhgrp 2
+        set remote-gw 3.37.222.43
+        set psksecret sknetvpn
+        set dpd-retryinterval 10
+    next
+    edit "aws-ko-site2"
+        set interface "wan1"
+        set ike-version 2
+        set keylife 28800
+        set peertype any
+        set net-device disable
+        set proposal aes128-sha1
+        set dpd on-idle
+        set dhgrp 2
+        set nattraversal disable
+        set remote-gw 52.78.7.152
+        set psksecret sknetvpn
+        set dpd-retrycount 10
+    next
+end
+
+config vpn ipsec phase2-interface
+    edit "aws-ko-site"
+        set phase1name "aws-ko-site"
+        set proposal aes128-sha1
+        set dhgrp 2
+        set replay disable
+        set auto-negotiate enable
+        set keylifeseconds 3600
+    next
+    edit "aws-ko-site2"
+        set phase1name "aws-ko-site2"
+        set proposal aes128-sha1
+        set dhgrp 2
+        set auto-negotiate enable
+        set keylifeseconds 3600
+    next
+end
+
+config system interface
+    edit "wan1"
+        set vdom "root"
+        set ip 49.50.63.182 255.255.255.252
+        set allowaccess ping https ssh snmp fgfm fabric ftm
+        set type physical
+        set alias "KOsite"
+        set role wan
+    next
+    edit "TEST0"
+        set vdom "root"
+        set ip 192.168.30.1 255.255.255.252
+        set allowaccess ping
+        set type vdom-link
+    next
+    edit "aws-ko-site"
+        set vdom "root"
+        set ip 169.254.30.2 255.255.255.255
+        set allowaccess ping
+        set type tunnel
+        set remote-ip 169.254.30.1 255.255.255.255
+        set mtu-override enable
+        set mtu 1350
+        set interface "wan1"
+    next
+    edit "aws-ko-site2"
+        set vdom "root"
+        set ip 169.254.31.2 255.255.255.255
+        set allowaccess ping
+        set type tunnel
+        set remote-ip 169.254.31.1 255.255.255.255
+        set mtu-override enable
+        set mtu 1350
+        set interface "wan1"
+    next
+end
+
+config firewall policy
+    edit 0
+        set name "TEST0-to-aws-ko-site"
+        set srcintf "TEST0"
+        set dstintf "aws-ko-site" "aws-ko-site2"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+    next
+    edit 0
+        set name "aws-ko-site-to-TEST0"
+        set srcintf "aws-ko-site" "aws-ko-site2"
+        set dstintf "TEST0"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+    next
+end
+
+config router access-list
+    edit "tunnel1"
+        config rule
+            edit 1
+                set prefix 169.254.30.2 255.255.255.255
+            next
+            edit 2
+                set prefix 192.168.30.0 255.255.255.252
+            next
+        end
+    next
+    edit "tunnel2"
+        config rule
+            edit 1
+                set prefix 169.254.31.2 255.255.255.255
+            next
+            edit 2
+                set prefix 192.168.30.0 255.255.255.252
+            next
+        end
+    next
+end
+
+config router bgp
+    set as 65001
+    set router-id 49.50.63.182
+    set ebgp-multipath enable
+    set distance-external 150
+    config neighbor
+        edit "169.254.30.1"
+            set ebgp-enforce-multihop enable
+            set soft-reconfiguration enable
+            set distribute-list-out "tunnel1"
+            set interface "aws-ko-site"
+            set remote-as 64531
+        next
+        edit "169.254.31.1"
+            set ebgp-enforce-multihop enable
+            set soft-reconfiguration enable
+            set distribute-list-out "tunnel2"
+            set interface "aws-ko-site2"
+            set remote-as 64531
+        next
+    end
+    config network
+        edit 1
+            set prefix 169.254.30.2 255.255.255.255
+        next
+        edit 2
+            set prefix 169.254.31.2 255.255.255.255
+        next
+        edit 3
+            set prefix 192.168.30.0 255.255.255.252
+        next
+    end
+end
