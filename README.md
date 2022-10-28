@@ -1,5 +1,7 @@
 # FortiOS-Multi-VDOM
 ## Inter-VDOM간 통신 테스트 (IPsec-over-IPsec)
+### 네트워크 구성도
+![Diagram](./fortios/fortigate-multi-vdom.png "Diagram")
 
 ## 1. 한국 FortiGate 장비 설정
 ### VDOM-KO (1번째 VDOM, root)
@@ -127,5 +129,5 @@ round-trip min/avg/max = 378.8/380.1/381.9 ms
 ## 4. AWS 미국리전 Transit Gateway 라우팅 정보
 ![Routes](./fortios/aws-us-tgw-routes.png "AWS-US TGW Routing")
 
-![Diagram](./fortios/fortigate-multi-vdom.png "Diagram")
+
 
