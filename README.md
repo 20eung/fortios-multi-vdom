@@ -120,5 +120,12 @@ PING 192.168.31.1 (192.168.31.1): 56 data bytes
 5 packets transmitted, 5 packets received, 0% packet loss
 round-trip min/avg/max = 378.8/380.1/381.9 ms
 ```
+
+## 3. AWS 한국리전 Transit Gateway 라우팅 정보
+![Routes](./fortios/aws-ko-tgw-routes.png "AWS-KO TGW Routing")
+
+## 4. AWS 미국리전 Transit Gateway 라우팅 정보
+![Routes](./fortios/aws-us-tgw-routes.png "AWS-US TGW Routing")
+
 ![Diagram](./fortios/fortigate-multi-vdom.png "Diagram")
 
