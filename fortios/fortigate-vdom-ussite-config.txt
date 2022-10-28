@@ -12,7 +12,7 @@ config vpn ipsec phase1-interface
         set dpd on-idle
         set dhgrp 2
         set remote-gw 192.168.30.2
-        set psksecret sknetvpn
+        set psksecret **netvpn
         set dpd-retryinterval 10
     next
 end
