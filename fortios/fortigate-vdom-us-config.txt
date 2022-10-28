@@ -12,7 +12,7 @@ config vpn ipsec phase1-interface
         set dpd on-idle
         set dhgrp 2
         set remote-gw 3.214.238.162
-        set psksecret sknetvpn
+        set psksecret **netvpn
         set dpd-retryinterval 10
     next
     edit "aws-us-site2"
@@ -26,7 +26,7 @@ config vpn ipsec phase1-interface
         set dhgrp 2
         set nattraversal disable
         set remote-gw 54.82.166.73
-        set psksecret sknetvpn
+        set psksecret **netvpn
         set dpd-retrycount 10
     next
 end
@@ -53,7 +53,7 @@ config system interface
     edit "wan2"
         set vdom "VDOM-US"
         set ip 61.97.9.202 255.255.255.252
-        set allowaccess ping https ssh snmp fgfm fabric ftm
+        set allowaccess ping
         set type physical
         set alias "USsite"
         set lldp-reception enable
