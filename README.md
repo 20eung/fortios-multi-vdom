@@ -1,4 +1,4 @@
-# FortiOS-Multi-VDOM
+# AWS-FortiOS-Multi-VDOM
 ## 내부 VDOM간 VPN 통신 테스트 (IPsec-over-IPsec)
 ### 네트워크 구성도
 ![Diagram](./fortios/fortigate-multi-vdom.png "Diagram")
