@@ -21,6 +21,18 @@ B       169.254.41.2/32 [150/100] via 169.254.30.1, aws-ko-site, 00:38:26
 C       192.168.30.0/30 is directly connected, TEST0
 B       192.168.40.0/30 [150/100] via 169.254.30.1, aws-ko-site, 00:38:26
                         [150/100] via 169.254.31.1, aws-ko-site2, 00:38:26
+                        
+FG60E (root) # execute ping 192.168.40.1
+PING 192.168.40.1 (192.168.40.1): 56 data bytes
+64 bytes from 192.168.40.1: icmp_seq=0 ttl=250 time=371.5 ms
+64 bytes from 192.168.40.1: icmp_seq=1 ttl=250 time=369.4 ms
+64 bytes from 192.168.40.1: icmp_seq=2 ttl=250 time=369.3 ms
+64 bytes from 192.168.40.1: icmp_seq=3 ttl=250 time=369.6 ms
+64 bytes from 192.168.40.1: icmp_seq=4 ttl=250 time=369.4 ms
+
+--- 192.168.40.1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 369.3/369.8/371.5 ms
 ```
 
 ### VDOM-KOsite (2번째 VDOM)
@@ -36,6 +48,18 @@ C       192.168.30.0/30 is directly connected, TEST1
 C       192.168.31.0/24 is directly connected, loopback30
 S       192.168.40.2/32 [10/0] via 192.168.30.1, TEST1
 S       192.168.41.0/24 [10/0] via 169.254.34.1, us-site-vpn
+
+FG60E (VDOM-KOsite) # execute ping 192.168.41.1
+PING 192.168.41.1 (192.168.41.1): 56 data bytes
+64 bytes from 192.168.41.1: icmp_seq=0 ttl=255 time=374.6 ms
+64 bytes from 192.168.41.1: icmp_seq=1 ttl=255 time=372.7 ms
+64 bytes from 192.168.41.1: icmp_seq=2 ttl=255 time=372.5 ms
+64 bytes from 192.168.41.1: icmp_seq=3 ttl=255 time=372.5 ms
+64 bytes from 192.168.41.1: icmp_seq=4 ttl=255 time=372.8 ms
+
+--- 192.168.41.1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 372.5/373.0/374.6 ms
 ```
 
 ## 2. 미국 FortiGate 장비 설정
@@ -56,6 +80,18 @@ C       169.254.41.2/32 is directly connected, aws-us-site2
 B       192.168.30.0/30 [150/100] via 169.254.40.1, aws-us-site, 00:41:24
                         [150/100] via 169.254.41.1, aws-us-site2, 00:41:24
 C       192.168.40.0/30 is directly connected, TEST20
+
+FG60E (VDOM-US) # execute ping 192.168.30.1
+PING 192.168.30.1 (192.168.30.1): 56 data bytes
+64 bytes from 192.168.30.1: icmp_seq=0 ttl=250 time=373.3 ms
+64 bytes from 192.168.30.1: icmp_seq=1 ttl=250 time=371.4 ms
+64 bytes from 192.168.30.1: icmp_seq=2 ttl=250 time=371.4 ms
+64 bytes from 192.168.30.1: icmp_seq=3 ttl=250 time=371.9 ms
+64 bytes from 192.168.30.1: icmp_seq=4 ttl=250 time=371.5 ms
+
+--- 192.168.30.1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 371.4/371.9/373.3 ms
 ```
 
 ### VDOM-USsite (2번째 VDOM)
@@ -71,6 +107,18 @@ S       192.168.30.2/32 [10/0] via 192.168.40.1, TEST21
 S       192.168.31.0/24 [10/0] via 169.254.34.2, ko-site-vpn
 C       192.168.40.0/30 is directly connected, TEST21
 C       192.168.41.0/24 is directly connected, loopback40
+
+FG60E (VDOM-USsite) # execute ping 192.168.31.1
+PING 192.168.31.1 (192.168.31.1): 56 data bytes
+64 bytes from 192.168.31.1: icmp_seq=0 ttl=255 time=381.9 ms
+64 bytes from 192.168.31.1: icmp_seq=1 ttl=255 time=379.6 ms
+64 bytes from 192.168.31.1: icmp_seq=2 ttl=255 time=378.8 ms
+64 bytes from 192.168.31.1: icmp_seq=3 ttl=255 time=380.3 ms
+64 bytes from 192.168.31.1: icmp_seq=4 ttl=255 time=379.9 ms
+
+--- 192.168.31.1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 378.8/380.1/381.9 ms
 ```
 ![Diagram](./fortios/fortigate-multi-vdom.png "Diagram")
 
