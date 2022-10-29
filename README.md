@@ -1,5 +1,4 @@
-# AWS-FortiOS-Multi-VDOM
-## FortiGate Private VDOM간 IPSec VPN 구성
+# FortiGate Private VDOM간 IPSec VPN 구성
 ![Diagram](./fortios/diagram.png "Diagram")
 
 ## 1. 한국 FortiGate 장비 설정
