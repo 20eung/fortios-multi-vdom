@@ -1,5 +1,5 @@
 # FortiGate Private VDOM간 IPSec VPN 구성
-![Diagram](./fortios/diagram.png "Diagram")
+![Diagram](./img/diagram.png "Diagram")
 
 ## 1. 한국 FortiGate 장비 설정
 ### VDOM-KO (1번째 VDOM, root)
@@ -35,7 +35,7 @@ PING 192.168.40.1 (192.168.40.1): 56 data bytes
 round-trip min/avg/max = 369.3/369.8/371.5 ms
 ```
 ### AWS 한국리전 Transit Gateway 라우팅 정보
-![Routes](./fortios/aws-ko-tgw-routes.png "AWS-KO TGW Routing")
+![Routes](./img/aws-ko-tgw-routes.png "AWS-KO TGW Routing")
 
 
 ### VDOM-KOsite (2번째 VDOM)
@@ -97,7 +97,7 @@ PING 192.168.30.1 (192.168.30.1): 56 data bytes
 round-trip min/avg/max = 371.4/371.9/373.3 ms
 ```
 ### AWS 미국리전 Transit Gateway 라우팅 정보
-![Routes](./fortios/aws-us-tgw-routes.png "AWS-US TGW Routing")
+![Routes](./img/aws-us-tgw-routes.png "AWS-US TGW Routing")
 
 ### VDOM-USsite (2번째 VDOM)
 - TEST1 인터페이스 IP로 한국 FortiGate 장비의 VDOM-KOsite VDOM과 IPsec VPN 연결
@@ -125,5 +125,3 @@ PING 192.168.31.1 (192.168.31.1): 56 data bytes
 5 packets transmitted, 5 packets received, 0% packet loss
 round-trip min/avg/max = 378.8/380.1/381.9 ms
 ```
-
-

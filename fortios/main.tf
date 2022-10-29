@@ -1,8 +1,11 @@
 provider "fortios" {
-  alias = "vdom-ko"
-  vdom  = "root"
+  hostname      = "49.50.63.182"
+  token         = "9kNtm6bx0nG74ffbd59pdhc8kgsfgp"
+  insecure      = "true"
+  cabundlefile  = "/home/ubuntu/.ssh/cloud9-terraform.crt"
+  vdom          = "root"
 }
-
+/*
 provider "fortios" {
   alias = "vdom-us"
   vdom  = "VDOM-US"
@@ -17,14 +20,10 @@ provider "fortios" {
   alias = "vdom-ussite"
   vdom  = "VDOM-USsite"
 }
-
+*/
 
 module "aws_vpn_ko" {
 
-    providers = {
-      fortios = "vdom-ko"
-    }
-    
     source              = "./modules/ipsec_vpn"
     
     # IPsec VPN Phase1-interface 설정
@@ -36,15 +35,15 @@ module "aws_vpn_ko" {
     peertype            = "any"
     net_device	        = "disable"
     proposal_phase1	    = "aes128-sha1 3des-sha1 aes256-sha256"
-    dhgrp		        = "2"
+    dhgrp		            = "2"
     remote_gw           = ""
-    psksecret	        = "sknetvpn"
+    psksecret	          = "sknetvpn"
     dpd_retryinterval   = "10"
-    nattraversal		= "disable"
+    nattraversal		    = "disable"
     
     # IPsec VPN Phase2-interface 설정
-    proposal_phase2		= "aes128-sha1 3des-sha1 aes256-sha256"
-    pfs			        = "disable"
+    proposal_phase2		  = "aes128-sha1 3des-sha1 aes256-sha256"
+    pfs			            = "disable"
     auto_negotiate      = "enable"
     keylifeseconds	    = "27000"
 }
