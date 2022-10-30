@@ -1,8 +1,9 @@
 # FortiGate Private VDOM간 IPSec VPN 구성
 ![Diagram](./img/diagram.png "Diagram")
 
-## 1. SITE A FortiGate 장비 설정
-### root VDOM (1번째 VDOM, root)
+## 1. SITE A 설정
+
+### 1. SITE A FortiGate 장비: root VDOM 설정(1번째 VDOM, root)
 - AWS Virtual Private Network(VPN)과 Site-to-Site VPN 연결 후 BGP 연동
 - FortiGate 장비에서 BGP 라우팅 설정 방법
   - ASN 설정: AWS, Local
@@ -12,6 +13,8 @@
   - Neighbor 설정 시 터널 별 ACL 적용
     - route-map-out, distribute-list-out, filter-list-out 등 이용 가능
   - 이 방법을 사용해야 FortiGate 장비의 SD-WAN 설정의 Performance SLA 측정이 가능함
+
+### 2. AWS 서울리전: VPN, TGW 설정
 - AWS에서 라우팅 설정 방법
   - VPC 메뉴 Site-to-Site VPN 연결 생성 시 아래 옵션 적용
     - Target gateway type: Transit Gateway
@@ -23,9 +26,13 @@
     - 169.254.40.2/32: SITE B의 FortiGate VPN Tunnel_1 IP
     - 169.254.10.2/32: SITE B의 FortiGate VPN Tunnel_2 IP
     - 192.168.40.0/30: SITE B의 FortiGate inter-VDOM Link(TEST20) network
+    - ![aws-prefix-list](./img/aws-ko-prefix-list.png "aws-prefix-list")
   - VPC 메뉴 Transit gateway route tables에 Prefix list references 설정
     - 위에서 생성한 Prefix list를 Transit Gateway에 Attach
+    - ![aws-tgw-prefix-list](./img/aws-ko-tgw-prefix-list.png "aws-tgw-prefix-list")
   - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE A로 전파됨
+
+### 3. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
 - SITE A의 FortiGate 장비 root VDOM에서 라우팅 테이블 확인
   - B 로 표시된 3개 CIDR은 AWS에서 BGP로 수신한 것이며, SITE B의 IP임을 확인할 수 있음
   - B 로 표시된 3개 CIDR은 AWS에서 Prefix list로 생성한 것임을 확인할 수 있음
@@ -53,15 +60,17 @@ PING 192.168.40.1 (192.168.40.1): 56 data bytes
 64 bytes from 192.168.40.1: icmp_seq=3 ttl=250 time=369.6 ms
 64 bytes from 192.168.40.1: icmp_seq=4 ttl=250 time=369.4 ms
 ```
-### AWS 한국리전 Transit Gateway 라우팅 정보
+### 4. AWS 서울리전: Transit Gateway 라우팅 정보
 ![Routes](./img/aws-ko-tgw-routes.png "AWS-KO TGW Routing")
 
 
-### VDOM-KOsite (2번째 VDOM)
+### 5. SITE A FortiGate 장비: VDOM-KOsite 설정(2번째 VDOM)
 - TEST1 인터페이스 IP로 미국 FortiGate 장비의 VDOM-USsite VDOM과 IPsec VPN 연결
 - IPsec VPN 연결 후 static routing 설정
 - Route to 미국: Loopback30 (내부 네트워크)
 - Route from 미국: Loopback40 (내부 네트워크)
+
+### 6. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
 ```
 FG60E (VDOM-KOsite) # get router info routing-table all
 C       169.254.34.1/32 is directly connected, us-site-vpn
@@ -76,16 +85,11 @@ PING 192.168.41.1 (192.168.41.1): 56 data bytes
 64 bytes from 192.168.41.1: icmp_seq=0 ttl=255 time=374.6 ms
 64 bytes from 192.168.41.1: icmp_seq=1 ttl=255 time=372.7 ms
 64 bytes from 192.168.41.1: icmp_seq=2 ttl=255 time=372.5 ms
-64 bytes from 192.168.41.1: icmp_seq=3 ttl=255 time=372.5 ms
-64 bytes from 192.168.41.1: icmp_seq=4 ttl=255 time=372.8 ms
-
---- 192.168.41.1 ping statistics ---
-5 packets transmitted, 5 packets received, 0% packet loss
-round-trip min/avg/max = 372.5/373.0/374.6 ms
 ```
 
-## 2. SITE B FortiGate 장비 설정
-### VDOM-US (1번째 VDOM, root)
+## 2. SITE B 설정
+
+### 1. 1. SITE A FortiGate 장비: VDOM-US 설정(1번째 VDOM, root)
 - AWS와 IPsec VPN 연결 후 BGP 연동
 - Route to AWS: tunnel_1 ip, tunnel_2 ip, VDOM Link Interface (TEST20)
 - Route from AWS: 한국 FortiGate 장비 tunnel_1 ip, tunnel_2, ip, VDOM Link Interface(TEST0)
@@ -115,10 +119,10 @@ PING 192.168.30.1 (192.168.30.1): 56 data bytes
 5 packets transmitted, 5 packets received, 0% packet loss
 round-trip min/avg/max = 371.4/371.9/373.3 ms
 ```
-### AWS 미국리전 Transit Gateway 라우팅 정보
+### 2. AWS 미국리전 Transit Gateway 라우팅 정보
 ![Routes](./img/aws-us-tgw-routes.png "AWS-US TGW Routing")
 
-### VDOM-USsite (2번째 VDOM)
+### 3. VDOM-USsite (2번째 VDOM)
 - TEST1 인터페이스 IP로 한국 FortiGate 장비의 VDOM-KOsite VDOM과 IPsec VPN 연결
 - IPsec VPN 연결 후 static routing 설정
 - Route to 한국: Loopback40 (내부 네트워크)
@@ -137,10 +141,4 @@ PING 192.168.31.1 (192.168.31.1): 56 data bytes
 64 bytes from 192.168.31.1: icmp_seq=0 ttl=255 time=381.9 ms
 64 bytes from 192.168.31.1: icmp_seq=1 ttl=255 time=379.6 ms
 64 bytes from 192.168.31.1: icmp_seq=2 ttl=255 time=378.8 ms
-64 bytes from 192.168.31.1: icmp_seq=3 ttl=255 time=380.3 ms
-64 bytes from 192.168.31.1: icmp_seq=4 ttl=255 time=379.9 ms
-
---- 192.168.31.1 ping statistics ---
-5 packets transmitted, 5 packets received, 0% packet loss
-round-trip min/avg/max = 378.8/380.1/381.9 ms
 ```
