@@ -4,7 +4,7 @@
 ## 1. SITE A 설정
 
 ### 1. SITE A FortiGate 장비: root VDOM 설정(1번째 VDOM, root)
-- AWS Virtual Private Network(VPN)과 Site-to-Site VPN 연결 후 BGP 연동
+- AWS 서울리전 Virtual Private Network(VPN)과 Site-to-Site VPN 연결 후 BGP 연동
 - FortiGate 장비에서 BGP 라우팅 설정 방법
   - ASN 설정: AWS, Local
   - VPN 터널 별 ACL 생성
@@ -24,12 +24,12 @@
   - VPC 메뉴 Managed prefix lists를 미리 생성하면 관리가 편함
     - 서울리전 VPC에 Prefix list를 아래와 같이 생성(미국리전 IP대역)
     - 169.254.40.2/32: SITE B의 FortiGate VPN Tunnel_1 IP
-    - 169.254.10.2/32: SITE B의 FortiGate VPN Tunnel_2 IP
+    - 169.254.41.2/32: SITE B의 FortiGate VPN Tunnel_2 IP
     - 192.168.40.0/30: SITE B의 FortiGate inter-VDOM Link(TEST20) network
-      ![aws-prefix-list](./img/aws-ko-prefix-list.png "aws-prefix-list")
+      ![aws-ko-prefix-list](./img/aws-ko-prefix-list.png "aws-ko-prefix-list")
   - VPC 메뉴 Transit gateway route tables에 Prefix list references 설정
     - 위에서 생성한 Prefix list를 Transit Gateway에 Attach
-      ![aws-tgw-prefix-list](./img/aws-ko-tgw-prefix-list.png "aws-tgw-prefix-list")
+      ![aws-ko-tgw-prefix-list](./img/aws-ko-tgw-prefix-list.png "aws-ko-tgw-prefix-list")
   - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE A로 전파됨
 
 ### 3. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
@@ -95,9 +95,38 @@ PING 192.168.41.1 (192.168.41.1): 56 data bytes
 ## 2. SITE B 설정
 
 ### 1. 1. SITE A FortiGate 장비: VDOM-US 설정(1번째 VDOM, root)
-- AWS와 IPsec VPN 연결 후 BGP 연동
-- Route to AWS: tunnel_1 ip, tunnel_2 ip, VDOM Link Interface (TEST20)
-- Route from AWS: 한국 FortiGate 장비 tunnel_1 ip, tunnel_2, ip, VDOM Link Interface(TEST0)
+- AWS 미국리전 Virtual Private Network(VPN)과 Site-to-Site VPN 연결 후 BGP 연동
+- FortiGate 장비에서 BGP 라우팅 설정 방법
+  - ASN 설정: AWS, Local
+  - VPN 터널 별 ACL 생성
+    - ACL1: tunnel_1 ip(169.254.40.2/32), inter-VDOM Link(TEST20) network(192.168.40.0/30)
+    - ACL2: tunnel_2 ip(169.254.41.2/32), inter-VDOM Link(TEST20) network(192.168.40.0/30)
+  - BGP Neighbor 설정 시 VPN 터널 별 ACL 적용
+    - route-map-out, distribute-list-out, filter-list-out 등 이용하여 AWS로 BGP로 광고 가능
+  - 이 방법을 사용해야 FortiGate 장비의 SD-WAN 설정의 Performance SLA 측정이 가능함
+
+### 2. AWS 미국리전: VPN, TGW 설정
+- AWS에서 라우팅 설정 방법
+  - VPC 메뉴 Site-to-Site VPN 연결 생성 시 아래 옵션 적용
+    - Target gateway type: Transit Gateway
+    - Routing options: Dynamic (requires BGP)
+    - Enable acceleration: 해외 사이트 연결 시 사용하면 속도 향상 효과가 있음
+    - Tunnel 1/2 options: Inside IPv4 CIDR, Pre-shared key 설정
+  - VPC 메뉴 Managed prefix lists를 미리 생성하면 관리가 편함
+    - 미국리전 VPC에 Prefix list를 아래와 같이 생성(서울리전 IP대역)
+    - 169.254.30.2/32: SITE A의 FortiGate VPN Tunnel_1 IP
+    - 169.254.31.2/32: SITE A의 FortiGate VPN Tunnel_2 IP
+    - 192.168.30.0/30: SITE A의 FortiGate inter-VDOM Link(TEST0) network
+      ![aws-us-prefix-list](./img/aws-us-prefix-list.png "aws-us-prefix-list")
+  - VPC 메뉴 Transit gateway route tables에 Prefix list references 설정
+    - 위에서 생성한 Prefix list를 Transit Gateway에 Attach
+      ![aws-us-tgw-prefix-list](./img/aws-us-tgw-prefix-list.png "aws-us-tgw-prefix-list")
+  - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE B로 전파됨
+
+### 3. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
+- SITE A의 FortiGate 장비 root VDOM에서 라우팅 테이블 확인
+  - B 로 표시된 3개 CIDR은 AWS 서울리전에서 BGP로 수신한 것이며, SITE B의 IP임을 확인할 수 있음
+  - B 로 표시된 3개 CIDR은 AWS 서울리전에서 Prefix list로 생성한 것임을 확인할 수 있음
 ```
 FG60E (VDOM-US) # get router info routing-table all
 B       169.254.30.2/32 [150/100] via 169.254.40.1, aws-us-site, 00:41:24
