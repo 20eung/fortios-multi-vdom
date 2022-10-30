@@ -55,7 +55,6 @@ config system interface
         set ip 61.97.9.202 255.255.255.252
         set allowaccess ping
         set type physical
-        set alias "USsite"
         set lldp-reception enable
         set role wan
     next
@@ -70,9 +69,8 @@ config system interface
         set ip 169.254.40.2 255.255.255.255
         set allowaccess ping
         set type tunnel
+        set tcp-mss 1350
         set remote-ip 169.254.40.1 255.255.255.255
-        set mtu-override enable
-        set mtu 1350
         set interface "wan2"
     next
     edit "aws-us-site2"
@@ -80,10 +78,18 @@ config system interface
         set ip 169.254.41.2 255.255.255.255
         set allowaccess ping
         set type tunnel
+        set tcp-mss 1350
         set remote-ip 169.254.41.1 255.255.255.255
-        set mtu-override enable
-        set mtu 1350
         set interface "wan2"
+    next
+end
+
+config firewall address
+    edit "192.168.30.2/32"
+        set subnet 192.168.30.2 255.255.255.255
+    next
+    edit "192.168.40.2/32"
+        set subnet 192.168.40.2 255.255.255.255
     next
 end
 
@@ -92,22 +98,22 @@ config firewall policy
         set name "TEST20-to-aws-us-site"
         set srcintf "TEST20"
         set dstintf "aws-us-site" "aws-us-site2"
-        set srcaddr "all"
-        set dstaddr "all"
+        set srcaddr "192.168.40.2/32"
+        set dstaddr "192.168.30.2/32"
         set action accept
         set schedule "always"
-        set service "ALL"
+        set service "IKE"
         set logtraffic all
     next
     edit 2
         set name "aws-us-site-to-TEST20"
         set srcintf "aws-us-site" "aws-us-site2"
         set dstintf "TEST20"
-        set srcaddr "all"
-        set dstaddr "all"
+        set srcaddr "192.168.30.2/32"
+        set dstaddr "192.168.40.2/32"
         set action accept
         set schedule "always"
-        set service "ALL"
+        set service "IKE"
         set logtraffic all
     next
 end
@@ -134,6 +140,7 @@ config router access-list
         end
     next
 end
+
 config router bgp
     set as 65002
     set router-id 61.97.9.202

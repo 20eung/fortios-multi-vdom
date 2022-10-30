@@ -2,6 +2,14 @@ FG60E # config global
 
 FG60E (global) # show system interface TEST0
 config system interface
+    edit "wan1"
+        set vdom "root"
+        set ip 49.50.63.182 255.255.255.252
+        set allowaccess ping
+        set type physical
+        set alias "KOsite"
+        set role wan
+    next
     edit "TEST0"
         set vdom "root"
         set ip 192.168.30.1 255.255.255.252
