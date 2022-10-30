@@ -123,10 +123,10 @@ PING 192.168.41.1 (192.168.41.1): 56 data bytes
       ![aws-us-tgw-prefix-list](./img/aws-us-tgw-prefix-list.png "aws-us-tgw-prefix-list")
   - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE B로 전파됨
 
-### 3. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
-- SITE A의 FortiGate 장비 root VDOM에서 라우팅 테이블 확인
-  - B 로 표시된 3개 CIDR은 AWS 서울리전에서 BGP로 수신한 것이며, SITE B의 IP임을 확인할 수 있음
-  - B 로 표시된 3개 CIDR은 AWS 서울리전에서 Prefix list로 생성한 것임을 확인할 수 있음
+### 3. SITE B FortiGate 장비: VDOM-US(root VDOM) 라우팅 테이블 확인
+- SITE B의 FortiGate 장비 VDOM-US(root VDOM)에서 라우팅 테이블 확인
+  - B 로 표시된 3개 CIDR은 AWS 미국리전에서 BGP로 수신한 것이며, SITE A의 IP임을 확인할 수 있음
+  - B 로 표시된 3개 CIDR은 AWS 미국리전에서 Prefix list로 생성한 것임을 확인할 수 있음
 ```
 FG60E (VDOM-US) # get router info routing-table all
 B       169.254.30.2/32 [150/100] via 169.254.40.1, aws-us-site, 00:41:24
@@ -140,27 +140,30 @@ C       169.254.41.2/32 is directly connected, aws-us-site2
 B       192.168.30.0/30 [150/100] via 169.254.40.1, aws-us-site, 00:41:24
                         [150/100] via 169.254.41.1, aws-us-site2, 00:41:24
 C       192.168.40.0/30 is directly connected, TEST20
-
+```
+- SITE B VDOM-US(root VDOM)에서 SITE A의 FortiGate 장비 TEST0 인터페이스로 ping 통신 확인
+```
 FG60E (VDOM-US) # execute ping 192.168.30.1
 PING 192.168.30.1 (192.168.30.1): 56 data bytes
 64 bytes from 192.168.30.1: icmp_seq=0 ttl=250 time=373.3 ms
 64 bytes from 192.168.30.1: icmp_seq=1 ttl=250 time=371.4 ms
 64 bytes from 192.168.30.1: icmp_seq=2 ttl=250 time=371.4 ms
-64 bytes from 192.168.30.1: icmp_seq=3 ttl=250 time=371.9 ms
-64 bytes from 192.168.30.1: icmp_seq=4 ttl=250 time=371.5 ms
-
---- 192.168.30.1 ping statistics ---
-5 packets transmitted, 5 packets received, 0% packet loss
-round-trip min/avg/max = 371.4/371.9/373.3 ms
 ```
-### 2. AWS 미국리전 Transit Gateway 라우팅 정보
+### 4. AWS 미국리전: Transit Gateway 라우팅 테이블 확인
+- SITE B의 VPN 터널 IP는 개별 VPN으로 통신: 169.254.40.2/32, 169.254.41.2/32
+- 위 라우팅이 있어야 FortiGate 장비의 SD-WAN Performance SLA 측정이 가능함
+- SITE B inter-VDOM Link(TEST20) network(192.168.40.0/30)은 2개의 VPN으로 통신
+- AWS 서울리전 IP 대역은 Prefix list references 설정에 의해 Propagated 된 것을 확인할 수 있음
 ![Routes](./img/aws-us-tgw-routes.png "AWS-US TGW Routing")
 
-### 3. VDOM-USsite (2번째 VDOM)
-- TEST1 인터페이스 IP로 한국 FortiGate 장비의 VDOM-KOsite VDOM과 IPsec VPN 연결
-- IPsec VPN 연결 후 static routing 설정
-- Route to 한국: Loopback40 (내부 네트워크)
-- Route from 한국: Loopback30 (내부 네트워크)
+### 5. SITE B FortiGate 장비: VDOM-USsite 설정(2번째 VDOM)
+- TEST21 인터페이스 IP(사설IP)로 한국 FortiGate 장비의 VDOM-KOsite VDOM(사설IP)과 IPsec VPN 연결
+- IPsec VPN(ko-site-vpn) 연결 후 static routing 설정
+- SITE A 내부 네트워크(192.168.31.0/24), 인터페이스는 ko-site-vpn
+
+### 6. SITE B FortiGate 장비: VDOM-USsite 라우팅 테이블 확인
+- 위에서 static routing 설정한 192.168.31.0/24 확인 가능
+- SITE B와 VPN 연결을 하기 위한 192.168.30.2/32 확인 가능
 ```
 FG60E (VDOM-USsite) # get router info routing-table all
 C       169.254.34.1/32 is directly connected, ko-site-vpn
@@ -169,7 +172,9 @@ S       192.168.30.2/32 [10/0] via 192.168.40.1, TEST21
 S       192.168.31.0/24 [10/0] via 169.254.34.2, ko-site-vpn
 C       192.168.40.0/30 is directly connected, TEST21
 C       192.168.41.0/24 is directly connected, loopback40
-
+```
+- SITE A의 VDOM-KOsite와 VPN 연결 후 SITE A 내부 네트워크와 통신 가능
+```
 FG60E (VDOM-USsite) # execute ping 192.168.31.1
 PING 192.168.31.1 (192.168.31.1): 56 data bytes
 64 bytes from 192.168.31.1: icmp_seq=0 ttl=255 time=381.9 ms
