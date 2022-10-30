@@ -26,10 +26,10 @@
     - 169.254.40.2/32: SITE B의 FortiGate VPN Tunnel_1 IP
     - 169.254.41.2/32: SITE B의 FortiGate VPN Tunnel_2 IP
     - 192.168.40.0/30: SITE B의 FortiGate inter-VDOM Link(TEST20) network
-      ![aws-ko-prefix-list](./img/aws-ko-prefix-list.png "aws-ko-prefix-list")
+![aws-ko-prefix-list](./img/aws-ko-prefix-list.png "aws-ko-prefix-list")
   - VPC 메뉴 Transit gateway route tables에 Prefix list references 설정
     - 위에서 생성한 Prefix list를 Transit Gateway에 Attach
-      ![aws-ko-tgw-prefix-list](./img/aws-ko-tgw-prefix-list.png "aws-ko-tgw-prefix-list")
+![aws-ko-tgw-prefix-list](./img/aws-ko-tgw-prefix-list.png "aws-ko-tgw-prefix-list")
   - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE A로 전파됨
 
 ### 3. SITE A FortiGate 장비: root VDOM 라우팅 테이블 확인
@@ -52,6 +52,7 @@ B       192.168.40.0/30 [150/100] via 169.254.30.1, aws-ko-site, 00:38:26
 ```
 - SITE A root VDOM에서 SITE B의 FortiGate 장비 TEST20 인터페이스로 ping 통신 확인
 ```                        
+FG60E (root) # execute ping-options source 192.168.30.1
 FG60E (root) # execute ping 192.168.40.1
 PING 192.168.40.1 (192.168.40.1): 56 data bytes
 64 bytes from 192.168.40.1: icmp_seq=0 ttl=250 time=371.5 ms
@@ -117,10 +118,10 @@ PING 192.168.41.1 (192.168.41.1): 56 data bytes
     - 169.254.30.2/32: SITE A의 FortiGate VPN Tunnel_1 IP
     - 169.254.31.2/32: SITE A의 FortiGate VPN Tunnel_2 IP
     - 192.168.30.0/30: SITE A의 FortiGate inter-VDOM Link(TEST0) network
-      ![aws-us-prefix-list](./img/aws-us-prefix-list.png "aws-us-prefix-list")
+![aws-us-prefix-list](./img/aws-us-prefix-list.png "aws-us-prefix-list")
   - VPC 메뉴 Transit gateway route tables에 Prefix list references 설정
     - 위에서 생성한 Prefix list를 Transit Gateway에 Attach
-      ![aws-us-tgw-prefix-list](./img/aws-us-tgw-prefix-list.png "aws-us-tgw-prefix-list")
+![aws-us-tgw-prefix-list](./img/aws-us-tgw-prefix-list.png "aws-us-tgw-prefix-list")
   - AWS TransitGateway의 Prefix list는 BGP로 Site-to-Site VPN 연결을 통해 SITE B로 전파됨
 
 ### 3. SITE B FortiGate 장비: VDOM-US(root VDOM) 라우팅 테이블 확인
@@ -143,6 +144,8 @@ C       192.168.40.0/30 is directly connected, TEST20
 ```
 - SITE B VDOM-US(root VDOM)에서 SITE A의 FortiGate 장비 TEST0 인터페이스로 ping 통신 확인
 ```
+FG60E (VDOM-US) # execute ping-options source 192.168.40.1
+
 FG60E (VDOM-US) # execute ping 192.168.30.1
 PING 192.168.30.1 (192.168.30.1): 56 data bytes
 64 bytes from 192.168.30.1: icmp_seq=0 ttl=250 time=373.3 ms

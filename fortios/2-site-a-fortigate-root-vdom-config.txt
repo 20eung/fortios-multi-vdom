@@ -77,6 +77,12 @@ config firewall address
     edit "192.168.40.2/32"
         set subnet 192.168.40.2 255.255.255.255
     next
+    edit "192.168.30.0/30"
+        set subnet 192.168.30.0 255.255.255.252
+    next
+    edit "192.168.40.0/30"
+        set subnet 192.168.40.0 255.255.255.252
+    next
 end
 
 config firewall policy
@@ -100,6 +106,28 @@ config firewall policy
         set action accept
         set schedule "always"
         set service "IKE"
+        set logtraffic all
+    next
+    edit 8
+        set name "TEST0-to-TEST20"
+        set srcintf "TEST0"
+        set dstintf "aws-ko-site" "aws-ko-site2"
+        set srcaddr "192.168.30.0/30"
+        set dstaddr "192.168.40.0/30"
+        set action accept
+        set schedule "always"
+        set service "ALL_ICMP"
+        set logtraffic all
+    next
+    edit 9
+        set name "TEST20-to-TEST0"
+        set srcintf "aws-ko-site" "aws-ko-site2"
+        set dstintf "TEST0"
+        set srcaddr "192.168.40.0/30"
+        set dstaddr "192.168.30.0/30"
+        set action accept
+        set schedule "always"
+        set service "ALL_ICMP"
         set logtraffic all
     next
 end
