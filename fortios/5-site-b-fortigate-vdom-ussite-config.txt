@@ -84,8 +84,8 @@ config firewall policy
         set name "lo40-to-ko-site-vpn"
         set srcintf "loopback40"
         set dstintf "ko-site-vpn"
-        set srcaddr "all"
-        set dstaddr "all"
+        set srcaddr "192.168.41.0/24"
+        set dstaddr "192.168.31.0/24"
         set action accept
         set schedule "always"
         set service "ALL"
@@ -95,8 +95,8 @@ config firewall policy
         set name "ko-site-vpn-to-lo40"
         set srcintf "ko-site-vpn"
         set dstintf "loopback40"
-        set srcaddr "all"
-        set dstaddr "all"
+        set srcaddr "192.168.31.0/24"
+        set dstaddr "192.168.41.0/24"
         set action accept
         set schedule "always"
         set service "ALL"
