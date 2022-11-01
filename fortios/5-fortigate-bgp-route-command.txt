@@ -1,0 +1,68 @@
+FG60E (root) # diagnose vpn tunnel list
+list all ipsec tunnel in vd 0
+------------------------------------------------------
+name=aws-ko-site ver=2 serial=1 49.50.63.182:4500->13.209.36.108:4500 dst_mtu=1500
+bound_if=5 lgwy=static/1 tun=intf/0 mode=auto/1 encap=none/520 options[0208]=npu frag-rfc  run_state=0 accept_traffic=1 overlay_id=0
+
+proxyid_num=1 child_num=0 refcnt=15 ilast=0 olast=0 ad=/0
+stat: rxp=1 txp=52803 rxb=3583738 txb=7314373
+dpd: mode=on-idle on=1 idle=10000ms retry=3 count=0 seqno=23
+natt: mode=silent draft=0 interval=10 remote_port=4500
+proxyid=aws-ko-site proto=0 sa=1 ref=4 serial=2 auto-negotiate
+  src: 0:0.0.0.0/0.0.0.0:0
+  dst: 0:0.0.0.0/0.0.0.0:0
+  SA:  ref=6 options=18225 type=00 soft=0 mtu=1422 expire=2216/0B replaywin=0
+       seqno=184 esn=0 replaywin_lastseq=00000000 itn=0 qat=0 hash_search_len=1
+  life: type=01 bytes=0/0 timeout=3331/3600
+  dec: spi=da67a74a esp=aes key=16 7226502c5e47fbaf6f752d86049279b1
+       ah=sha1 key=20 0e234e4c99afd17c20d6c5307f6a98b9ffb5e0d3
+  enc: spi=c3dd2a98 esp=aes key=16 f3fb20abcba3901cdf189a0371320653
+       ah=sha1 key=20 5b50512f71f04dfb57510cc7c61876e817deeb84
+  dec:pkts/bytes=0/16294, enc:pkts/bytes=387/95358
+  npu_flag=03 npu_rgwy=13.209.36.108 npu_lgwy=49.50.63.182 npu_selid=2 dec_npuid=1 enc_npuid=1
+run_tally=1
+------------------------------------------------------
+name=aws-ko-site2 ver=2 serial=2 49.50.63.182:0->13.209.125.111:0 dst_mtu=1500
+bound_if=5 lgwy=static/1 tun=intf/0 mode=auto/1 encap=none/520 options[0208]=npu frag-rfc  run_state=0 accept_traffic=1 overlay_id=0
+
+proxyid_num=1 child_num=0 refcnt=14 ilast=1 olast=1 ad=/0
+stat: rxp=1 txp=33937 rxb=830052 txb=2260655
+dpd: mode=on-idle on=1 idle=20000ms retry=10 count=0 seqno=5
+natt: mode=none draft=0 interval=0 remote_port=0
+proxyid=aws-ko-site2 proto=0 sa=1 ref=3 serial=2 auto-negotiate
+  src: 0:0.0.0.0/0.0.0.0:0
+  dst: 0:0.0.0.0/0.0.0.0:0
+  SA:  ref=6 options=18227 type=00 soft=0 mtu=1438 expire=1734/0B replaywin=1024
+       seqno=156 esn=0 replaywin_lastseq=00000000 itn=0 qat=0 hash_search_len=1
+  life: type=01 bytes=0/0 timeout=3327/3600
+  dec: spi=da67a749 esp=aes key=16 6f3c0c70eb36c5e8cf87ad104a52cb98
+       ah=sha1 key=20 b9c4a377a0b098ecd2a20b9ee94a7785ab52b42a
+  enc: spi=c93fc9a6 esp=aes key=16 09199d9cb40f8c5683b6e15dbacdbf78
+       ah=sha1 key=20 eeaaa4b64064745f8f9a9a53ded80e78781962e3
+  dec:pkts/bytes=0/16274, enc:pkts/bytes=341/46790
+  npu_flag=03 npu_rgwy=13.209.125.111 npu_lgwy=49.50.63.182 npu_selid=3 dec_npuid=1 enc_npuid=1
+run_tally=1
+
+
+FG60E (root) # get router info bgp summary
+VRF 0 BGP router identifier 49.50.63.182, local AS number 65001
+BGP table version is 21
+2 BGP AS-PATH entries
+0 BGP community entries
+
+Neighbor     V         AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+169.254.30.1 4      64531   36738   41748       20    0    0 1d20h04m        3
+169.254.31.1 4      64531   36735   41783       20    0    0 1d20h04m        3
+
+Total number of neighbors 2
+
+
+FG60E (root) # get router info routing-table bgp
+Routing table for VRF=0
+B       169.254.40.2/32 [150/100] via 169.254.31.1, aws-ko-site2, 1d20h04m
+                        [150/100] via 169.254.30.1, aws-ko-site, 1d20h04m
+B       169.254.41.2/32 [150/100] via 169.254.31.1, aws-ko-site2, 1d20h04m
+                        [150/100] via 169.254.30.1, aws-ko-site, 1d20h04m
+B       192.168.40.0/30 [150/100] via 169.254.31.1, aws-ko-site2, 1d20h04m
+                        [150/100] via 169.254.30.1, aws-ko-site, 1d20h04m
+
